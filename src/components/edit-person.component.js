@@ -1,7 +1,10 @@
 import React, { Component } from "react";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 
 export default class EditPerson extends Component {
+  params = useParams();
+
   constructor(props) {
     super(props);
 
@@ -20,6 +23,7 @@ export default class EditPerson extends Component {
   }
 
   componentDidMount() {
+    console.log(this.props);
     axios
       .get("http://localhost:5000/people/" + this.props.match.params.id)
       .then((response) => {
@@ -27,23 +31,10 @@ export default class EditPerson extends Component {
           familyname: response.data.familyname,
           forename: response.data.forename,
           dic: response.data.dic,
-          din: new Date(response.data.din),
+          din: response.data.din,
         });
       })
       .catch(function (error) {
-        console.log(error);
-      });
-
-    axios
-      .get("http://localhost:5000/users/")
-      .then((response) => {
-        if (response.data.length > 0) {
-          this.setState({
-            users: response.data.map((user) => user.familyname),
-          });
-        }
-      })
-      .catch((error) => {
         console.log(error);
       });
   }
@@ -66,28 +57,28 @@ export default class EditPerson extends Component {
     });
   }
 
-  onChangeDin(din) {
+  onChangeDin(e) {
     this.setState({
-      din: din,
+      din: e.target.value,
     });
   }
 
   onSubmit(e) {
     e.preventDefault();
 
-    const exercise = {
+    const person = {
       familyname: this.state.familyname,
       forename: this.state.forename,
       dic: this.state.dic,
       din: this.state.din,
     };
 
-    console.log(exercise);
+    console.log(person);
 
     axios
       .post(
-        "http://localhost:5000/exercises/update/" + this.props.match.params.id,
-        exercise
+        "http://localhost:5000/people/update/" + this.props.match.params.id,
+        person
       )
       .then((res) => console.log(res.data));
 
@@ -97,28 +88,20 @@ export default class EditPerson extends Component {
   render() {
     return (
       <div>
-        <h3>Edit Exercise Log</h3>
+        <h3>Edit Person Log</h3>
         <form onSubmit={this.onSubmit}>
           <div className="form-group">
-            <label>Username: </label>
-            <select
-              ref="userInput"
+            <label>Family name: </label>
+            <input
+              type="text"
               required
               className="form-control"
               value={this.state.familyname}
               onChange={this.onChangeFamilyname}
-            >
-              {this.state.users.map(function (user) {
-                return (
-                  <option key={user} value={user}>
-                    {user}
-                  </option>
-                );
-              })}
-            </select>
+            />
           </div>
           <div className="form-group">
-            <label>Description: </label>
+            <label>Fore name: </label>
             <input
               type="text"
               required
@@ -128,7 +111,7 @@ export default class EditPerson extends Component {
             />
           </div>
           <div className="form-group">
-            <label>Duration (in minutes): </label>
+            <label>ID code: </label>
             <input
               type="text"
               className="form-control"
@@ -137,19 +120,18 @@ export default class EditPerson extends Component {
             />
           </div>
           <div className="form-group">
-            <label>Date: </label>
-            <div>
-              <DatePicker
-                selected={this.state.din}
-                onChange={this.onChangeDin}
-              />
-            </div>
+            <label>ID number: </label>
+            <input
+              type="text"
+              className="form-control"
+              value={this.state.din}
+              onChange={this.onChangeDin}
+            />
           </div>
-
           <div className="form-group">
             <input
               type="submit"
-              value="Edit Exercise Log"
+              value="Edit Person Log"
               className="btn btn-primary"
             />
           </div>
